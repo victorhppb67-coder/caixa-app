@@ -7,10 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Caixa">
-    <meta name="description" content="App para gestão de caixa, movimentação diária e histórico de transações">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192' rx='45'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dominant-baseline='middle'>💰</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192' rx='45'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dominant-baseline='middle'>💰</text></svg>">
     <title>Caixa - Gestão de Transações</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -51,42 +48,7 @@
             width: 100vw;
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
         }
-
-        .install-prompt {
-            display: none;
-            background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 15px;
-            text-align: center;
-            font-size: 13px;
-            border-bottom: 2px solid var(--primary-dark);
-            animation: slideDown 0.3s ease-out;
-        }
-
-        .install-prompt.show { display: block; }
-
-        @keyframes slideDown {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .install-prompt button {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
-            margin-top: 8px;
-            margin-right: 8px;
-        }
-
-        .install-prompt button:active { background: rgba(255,255,255,0.3); }
 
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
@@ -109,7 +71,7 @@
             font-size: 11px;
         }
 
-        .header-user {
+        .header-operador {
             background: rgba(255,255,255,0.2);
             padding: 4px 10px;
             border-radius: 4px;
@@ -118,6 +80,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            cursor: pointer;
         }
 
         .main-container {
@@ -149,7 +112,6 @@
 
         .saldo-card.success { border-left-color: var(--success); }
         .saldo-card.danger { border-left-color: var(--danger); }
-        .saldo-card.warning { border-left-color: var(--warning); }
 
         .saldo-label {
             font-size: 11px;
@@ -166,40 +128,6 @@
 
         .saldo-card.success .saldo-valor { color: var(--success); }
         .saldo-card.danger .saldo-valor { color: var(--danger); }
-        .saldo-card.warning .saldo-valor { color: #d69e2e; }
-
-        .tabs-nav {
-            display: flex;
-            gap: 0;
-            background: var(--surface);
-            border-bottom: 2px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px 10px;
-            background: none;
-            border: none;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: 0.2s;
-            white-space: nowrap;
-            min-width: 60px;
-        }
-
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
 
         .tab-content {
             display: none;
@@ -225,7 +153,7 @@
             font-weight: 600;
         }
 
-        input, select, textarea {
+        input, select {
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border);
@@ -235,7 +163,7 @@
             background: white;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
@@ -280,13 +208,6 @@
 
         .btn-danger:active { background: #e53e3e; }
 
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-success:active { background: #38a169; }
-
         .btn-block {
             width: 100%;
             grid-column: 1 / -1;
@@ -330,16 +251,17 @@
 
         .transaction-tag {
             display: inline-block;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             padding: 3px 6px;
             border-radius: 3px;
             margin-top: 4px;
+            margin-right: 4px;
         }
 
-        .transaction-tag.entrada { background: #c6f6d5; color: #22543d; }
-        .transaction-tag.saida { background: #fed7d7; color: #742a2a; }
-        .transaction-tag.troco { background: #bee3f8; color: #2c5282; }
+        .tag-entrada { background: #c6f6d5; color: #22543d; }
+        .tag-saida { background: #fed7d7; color: #742a2a; }
+        .tag-operador { background: #bee3f8; color: #2c5282; }
 
         .transaction-value {
             font-size: 15px;
@@ -350,7 +272,6 @@
 
         .transaction-value.entrada { color: var(--success); }
         .transaction-value.saida { color: var(--danger); }
-        .transaction-value.troco { color: #4299e1; }
 
         .transaction-delete {
             padding: 6px;
@@ -407,104 +328,35 @@
             margin-bottom: 15px;
         }
 
-        .modal-body {
-            margin-bottom: 15px;
-        }
-
         .modal-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
 
-        .user-section {
-            background: var(--surface);
-            border-radius: 8px;
+        .alert {
             padding: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .user-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .user-item:last-child { border-bottom: none; }
-
-        .user-info {
-            flex: 1;
-        }
-
-        .user-name {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-
-        .user-role {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .user-delete {
-            padding: 6px;
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-        }
-
-        .report-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .report-card {
-            background: var(--surface);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .report-label {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .report-value {
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .filter-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .filter-btn {
-            padding: 10px;
-            border: 1px solid var(--border);
-            background: white;
             border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
+            margin-bottom: 12px;
+            font-size: 13px;
         }
 
-        .filter-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #c6f6d5;
+        }
+
+        .alert-warning {
+            background: #fffaf0;
+            color: #7c2d12;
+            border: 1px solid #fed7aa;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            color: #1e3a8a;
+            border: 1px solid #bfdbfe;
         }
 
         .bottom-nav {
@@ -545,84 +397,184 @@
             font-size: 20px;
         }
 
-        .alert {
+        .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .payment-btn {
             padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 12px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .payment-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .operador-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .operador-btn {
+            padding: 12px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .operador-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .operador-item {
+            background: var(--surface);
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .operador-info {
+            flex: 1;
+        }
+
+        .operador-nome {
+            font-weight: 600;
             font-size: 13px;
         }
 
-        .alert-success {
-            background: #f0fff4;
-            color: #22543d;
-            border: 1px solid #c6f6d5;
+        .operador-cargo {
+            font-size: 11px;
+            color: var(--text-muted);
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #1a1a1a;
-                --surface: #2d2d2d;
-                --border: #444;
-                --text: #f0f0f0;
-                --text-muted: #999;
-            }
+        .operador-delete {
+            padding: 6px;
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .report-card {
+            background: var(--surface);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+        }
+
+        .report-card.dinheiro { border-left-color: #48bb78; }
+        .report-card.debito { border-left-color: #4299e1; }
+        .report-card.credito { border-left-color: #ed8936; }
+        .report-card.pix { border-left-color: #9f7aea; }
+
+        .report-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .report-value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .info-box {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #22543d;
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="install-prompt" id="installPrompt">
-        <div style="margin-bottom: 8px;">
-            <strong>🚀 Instale como app!</strong> Clique abaixo para adicionar à tela inicial
-        </div>
-        <button onclick="instalarApp()">📱 Instalar</button>
-        <button onclick="fecharPromptInstalacao()" style="background: rgba(255,255,255,0.1);">✕ Fechar</button>
-    </div>
-
     <div class="header">
-        <div class="header-title">💰 Caixa</div>
+        <div class="header-title">💰 Caixa - Gestão Diária</div>
         <div class="header-info">
             <span id="dataHora"></span>
-            <div class="header-user" id="usuarioNome">Selecione operador</div>
+            <div class="header-operador" onclick="abrirAba('operadores'); atualizarNav(event.target);">
+                👤 <span id="operadorAtual">Operador</span>
+            </div>
         </div>
-    </div>
-
-    <div class="tabs-nav">
-        <button class="tab-btn active" onclick="abrirAba('caixa', this)">💵 Caixa</button>
-        <button class="tab-btn" onclick="abrirAba('relatorio', this)">📊 Relatório</button>
-        <button class="tab-btn" onclick="abrirAba('operadores', this)">👥 Operadores</button>
-        <button class="tab-btn" onclick="abrirAba('config', this)">⚙️ Config</button>
     </div>
 
     <div class="main-container">
         <div class="container">
             <!-- ABA CAIXA -->
             <div id="tab-caixa" class="tab-content active">
+                <div id="alertaTrocoAtual"></div>
+
                 <div class="saldo-cards">
+                    <div class="saldo-card success">
+                        <div class="saldo-label">💵 Dinheiro</div>
+                        <div class="saldo-valor" id="saldoDinheiro">R$ 0</div>
+                    </div>
                     <div class="saldo-card">
-                        <div class="saldo-label">Saldo</div>
+                        <div class="saldo-label">Total (Todas Formas)</div>
                         <div class="saldo-valor" id="saldoTotal">R$ 0</div>
                     </div>
-                    <div class="saldo-card success">
-                        <div class="saldo-label">Entradas</div>
-                        <div class="saldo-valor" id="totalEntradas">R$ 0</div>
-                    </div>
-                    <div class="saldo-card danger">
-                        <div class="saldo-label">Saídas</div>
-                        <div class="saldo-valor" id="totalSaidas">R$ 0</div>
-                    </div>
-                    <div class="saldo-card warning">
-                        <div class="saldo-label">Troco</div>
-                        <div class="saldo-valor" id="trocoDisponivel">R$ 0</div>
-                    </div>
                 </div>
+
+                <div class="info-box">
+                    💡 <strong>Operador:</strong> <span id="operadorCaixa">Nenhum</span> 
+                    <a href="#" onclick="abrirAba('operadores'); atualizarNav(event.target);" style="color: #22543d; text-decoration: underline;">Trocar</a>
+                </div>
+
+                <div class="section-title">Registrar Transação</div>
 
                 <div class="input-group">
                     <label>Tipo</label>
                     <select id="tipo">
-                        <option value="entrada">📥 Entrada</option>
-                        <option value="saida">📤 Saída</option>
-                        <option value="troco">💵 Troco</option>
+                        <option value="entrada">📥 Entrada (Venda)</option>
+                        <option value="saida">📤 Saída (Gasto)</option>
                     </select>
+                </div>
+
+                <div id="formasPagamentoDiv" class="input-group">
+                    <label>Forma de Pagamento</label>
+                    <div class="payment-grid">
+                        <button class="payment-btn active" onclick="selecionarPagamento('dinheiro', this)">💵 Dinheiro</button>
+                        <button class="payment-btn" onclick="selecionarPagamento('debito', this)">🏧 Débito</button>
+                        <button class="payment-btn" onclick="selecionarPagamento('credito', this)">💳 Crédito</button>
+                        <button class="payment-btn" onclick="selecionarPagamento('pix', this)">📱 PIX</button>
+                    </div>
+                    <input type="hidden" id="formaPagamento" value="dinheiro">
                 </div>
 
                 <div class="input-group">
@@ -640,6 +592,18 @@
                     <button class="btn btn-secondary" onclick="limparFormulario()">🔄 Limpar</button>
                 </div>
 
+                <div class="section-title">Resumo do Dia</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; background: white; padding: 12px; border-radius: 8px;">
+                    <div>
+                        <div style="font-size: 11px; color: #999; margin-bottom: 5px;">Entradas</div>
+                        <div style="font-size: 16px; font-weight: 700; color: #48bb78;" id="totalEntradas">R$ 0</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 11px; color: #999; margin-bottom: 5px;">Saídas</div>
+                        <div style="font-size: 16px; font-weight: 700; color: #f56565;" id="totalSaidas">R$ 0</div>
+                    </div>
+                </div>
+
                 <div class="section-title">Histórico de Hoje</div>
                 <div class="transaction-list" id="transacoesList">
                     <div class="empty-state">Nenhuma transação</div>
@@ -648,34 +612,49 @@
 
             <!-- ABA RELATÓRIO -->
             <div id="tab-relatorio" class="tab-content">
-                <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filtrarRelatorio('hoje', this)">Hoje</button>
-                    <button class="filter-btn" onclick="filtrarRelatorio('7dias', this)">7 dias</button>
-                    <button class="filter-btn" onclick="filtrarRelatorio('30dias', this)">30 dias</button>
-                    <button class="filter-btn" onclick="filtrarRelatorio('todos', this)">Tudo</button>
+                <div class="alert alert-warning">
+                    📌 <strong>Ao final do dia:</strong> O troco é calculado automaticamente como Dinheiro Recebido - Saídas em Dinheiro
                 </div>
 
-                <div class="report-grid">
-                    <div class="report-card">
-                        <div class="report-label">Entradas</div>
-                        <div class="report-value" style="color: var(--success);" id="relEntradas">R$ 0</div>
+                <div class="saldo-cards">
+                    <div class="saldo-card success">
+                        <div class="saldo-label">Entradas</div>
+                        <div class="saldo-valor" id="relEntradas">R$ 0</div>
                     </div>
-                    <div class="report-card">
-                        <div class="report-label">Saídas</div>
-                        <div class="report-value" style="color: var(--danger);" id="relSaidas">R$ 0</div>
-                    </div>
-                    <div class="report-card">
-                        <div class="report-label">Lucro</div>
-                        <div class="report-value" style="color: var(--primary);" id="relLucro">R$ 0</div>
+                    <div class="saldo-card danger">
+                        <div class="saldo-label">Saídas</div>
+                        <div class="saldo-valor" id="relSaidas">R$ 0</div>
                     </div>
                 </div>
+
+                <div class="section-title">Divisão por Forma de Pagamento (Entradas)</div>
+                <div class="report-grid">
+                    <div class="report-card dinheiro">
+                        <div class="report-label">Dinheiro</div>
+                        <div class="report-value" id="relDinheiro">R$ 0</div>
+                    </div>
+                    <div class="report-card debito">
+                        <div class="report-label">Débito</div>
+                        <div class="report-value" id="relDebito">R$ 0</div>
+                    </div>
+                    <div class="report-card credito">
+                        <div class="report-label">Crédito</div>
+                        <div class="report-value" id="relCredito">R$ 0</div>
+                    </div>
+                    <div class="report-card pix">
+                        <div class="report-label">PIX</div>
+                        <div class="report-value" id="relPix">R$ 0</div>
+                    </div>
+                </div>
+
+                <div id="trocoAutoDiv"></div>
 
                 <div class="btn-row" style="margin-bottom: 20px;">
                     <button class="btn btn-primary" onclick="exportarPDF()">📄 PDF</button>
-                    <button class="btn btn-success" onclick="exportarCSV()">📋 CSV</button>
+                    <button class="btn btn-primary" onclick="exportarCSV()">📋 CSV</button>
                 </div>
 
-                <div class="section-title">Transações</div>
+                <div class="section-title">Detalhamento</div>
                 <div class="transaction-list" id="transacoesRelatorio">
                     <div class="empty-state">Carregando...</div>
                 </div>
@@ -683,55 +662,70 @@
 
             <!-- ABA OPERADORES -->
             <div id="tab-operadores" class="tab-content">
-                <div id="statusOperador"></div>
+                <div class="alert alert-info">
+                    ℹ️ <strong>Operadores:</strong> Registre quem está no caixa para rastrear transações
+                </div>
+
+                <div style="background: var(--surface); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--primary);">
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Operador Ativo Agora</div>
+                    <div style="font-size: 20px; font-weight: 700; color: var(--primary);" id="operadorAtivoDisplay">Nenhum</div>
+                </div>
+
+                <div class="section-title">Selecionar Operador</div>
+                <div id="operadoresList" class="operador-grid">
+                    <button class="operador-btn" onclick="selecionarOperador('nenhum', this)">➕ Sem Operador</button>
+                </div>
+
+                <div class="section-title">Novo Operador</div>
 
                 <div class="input-group">
-                    <label>Nome do Operador</label>
-                    <input type="text" id="nomeOp" placeholder="Ex: João" autocomplete="off">
+                    <label>Nome</label>
+                    <input type="text" id="novoOperadorNome" placeholder="Ex: João">
                 </div>
 
                 <div class="input-group">
                     <label>Cargo</label>
-                    <input type="text" id="cargoOp" placeholder="Ex: Caixa" autocomplete="off">
+                    <input type="text" id="novoOperadorCargo" placeholder="Ex: Caixa, Gerente">
                 </div>
 
-                <button class="btn btn-primary btn-block" onclick="adicionarOperador()">➕ Adicionar</button>
+                <button class="btn btn-primary btn-block" onclick="adicionarOperador()">✅ Cadastrar Operador</button>
 
-                <div class="section-title">Operadores</div>
-                <div class="user-section" id="listaOperadores">
-                    <div class="empty-state">Nenhum operador</div>
+                <div class="section-title" style="margin-top: 25px;">Operadores Cadastrados</div>
+                <div id="listaOperadores">
+                    <div class="empty-state">Nenhum operador cadastrado</div>
+                </div>
+
+                <div class="section-title" style="margin-top: 25px;">Relatório por Operador</div>
+                <div id="relatorioOperadores">
+                    <div class="empty-state">Nenhuma transação</div>
                 </div>
             </div>
 
             <!-- ABA CONFIGURAÇÕES -->
             <div id="tab-config" class="tab-content">
-                <div class="section-title">Backup</div>
-                <div class="btn-row" style="margin-bottom: 20px;">
+                <div class="section-title">Troco Atual</div>
+                <div class="alert alert-info">
+                    ℹ️ O troco é calculado automaticamente: Dinheiro Recebido - Saídas em Dinheiro
+                </div>
+
+                <div style="background: var(--surface); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Troco Para Hoje</div>
+                    <div style="font-size: 28px; font-weight: 700; color: var(--success);" id="trocoAtivoDisplay">R$ 0</div>
+                </div>
+
+                <div class="section-title">Histórico de Trocos</div>
+                <div class="transaction-list" id="historicaTrocos">
+                    <div class="empty-state">Nenhum histórico</div>
+                </div>
+
+                <div class="section-title" style="margin-top: 30px;">Dados</div>
+                <div class="btn-row">
                     <button class="btn btn-primary" onclick="exportarBackup()">💾 Backup</button>
                     <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restaurar</button>
                     <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importarBackup()">
                 </div>
 
-                <div class="section-title">Dados</div>
-                <div class="btn-row">
-                    <button class="btn btn-danger" onclick="limparHistorico()">🗑️ Limpar Tudo</button>
-                </div>
-
-                <div class="section-title" style="margin-top: 30px;">Info</div>
-                <div class="user-section">
-                    <div class="user-item">
-                        <span>Transações</span>
-                        <strong id="statsTotal">0</strong>
-                    </div>
-                    <div class="user-item">
-                        <span>Operadores</span>
-                        <strong id="statsOp">0</strong>
-                    </div>
-                    <div class="user-item">
-                        <span>Armazenamento</span>
-                        <strong id="statsSize">0 KB</strong>
-                    </div>
-                </div>
+                <button class="btn btn-danger btn-block" style="margin-top: 10px;" onclick="limparHistorico()">🗑️ Limpar Tudo</button>
             </div>
         </div>
     </div>
@@ -755,11 +749,11 @@
         </button>
     </div>
 
-    <!-- MODALS -->
+    <!-- MODAL CONFIRMAÇÃO -->
     <div class="modal" id="modalConfirm">
         <div class="modal-content">
             <div class="modal-title" id="modalTitle">Confirmar</div>
-            <div class="modal-body" id="modalBody"></div>
+            <div id="modalBody"></div>
             <div class="modal-buttons">
                 <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
                 <button class="btn btn-danger" id="btnConfirmar" onclick="confirmarAcao()">Confirmar</button>
@@ -767,75 +761,25 @@
         </div>
     </div>
 
-    <!-- PDF -->
-    <div id="pdfContent" style="display: none;">
-        <h1>📊 Relatório de Caixa</h1>
-        <p id="pdfData"></p>
-        <hr>
-        <h2>Resumo</h2>
-        <table style="width: 100%; border-collapse: collapse;">
-            <tr><td>Entradas:</td><td style="text-align: right;"><strong id="pdfEntr">R$ 0</strong></td></tr>
-            <tr><td>Saídas:</td><td style="text-align: right;"><strong id="pdfSaid">R$ 0</strong></td></tr>
-            <tr style="font-weight: bold; border-top: 2px solid #000;">
-                <td>Lucro Líquido:</td>
-                <td style="text-align: right;"><strong id="pdfLucr">R$ 0</strong></td>
-            </tr>
-        </table>
-        <hr>
-        <h2>Detalhes</h2>
-        <table id="pdfTransacoes" style="width: 100%; border-collapse: collapse; font-size: 12px;"></table>
-    </div>
-
     <script>
-        const STORAGE_TRANSACOES = 'caixa_trans_pwa';
-        const STORAGE_OPERADORES = 'caixa_ops_pwa';
+        const STORAGE_TRANSACOES = 'caixa_trans_v31_op';
+        const STORAGE_TROCO = 'caixa_troco_v31_op';
+        const STORAGE_HISTORICO_TROCO = 'caixa_historico_troco_v31_op';
+        const STORAGE_OPERADORES = 'caixa_operadores_v31';
+        const STORAGE_OPERADOR_ATIVO = 'caixa_operador_ativo_v31';
         
-        let usuarioAtual = null;
+        let operadorAtivo = null;
         let acaoPendente = null;
-        let filtroAtual = 'hoje';
-        let deferredPrompt = null;
+        let formaPagamentoSelecionada = 'dinheiro';
 
-        // PWA - Verificar instalação
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installPrompt').classList.add('show');
-        });
-
-        window.addEventListener('appinstalled', () => {
-            console.log('App instalado!');
-            document.getElementById('installPrompt').classList.remove('show');
-        });
-
-        function instalarApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('Instalado com sucesso');
-                    }
-                    deferredPrompt = null;
-                    document.getElementById('installPrompt').classList.remove('show');
-                });
-            }
-        }
-
-        function fecharPromptInstalacao() {
-            document.getElementById('installPrompt').classList.remove('show');
-        }
-
-        // SERVICE WORKER
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('✅ Service Worker registrado', reg))
-                .catch(err => console.log('❌ Service Worker erro:', err));
-        }
-
-        // INICIALIZAÇÃO
         function inicializar() {
             atualizarHora();
             carregarOperadores();
+            carregarOperadorAtivo();
+            carregarTrocoAtivo();
             carregarTransacoes();
+            atualizarRelatorio();
+            atualizarHistoricoTrocos();
             
             setInterval(atualizarHora, 60000);
             setInterval(carregarTransacoes, 3000);
@@ -848,43 +792,70 @@
             document.getElementById('dataHora').textContent = `${hora} • ${data}`;
         }
 
-        // NAVEGAÇÃO
-        function abrirAba(aba, btn) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + aba).classList.add('active');
-            
-            if (btn) btn.classList.add('active');
-
-            if (aba === 'relatorio') {
-                setTimeout(() => atualizarRelatorio(), 100);
-            } else if (aba === 'config') {
-                atualizarStats();
-            }
-        }
-
-        function atualizarNav(btn) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
-        // OPERADORES
         function carregarOperadores() {
             const ops = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            const lista = document.getElementById('operadoresList');
             
-            if (!usuarioAtual && ops.length > 0) {
-                usuarioAtual = ops[0].id;
+            let html = '<button class="operador-btn" onclick="selecionarOperador(\'nenhum\', this)">➕ Sem Operador</button>';
+            
+            ops.forEach(op => {
+                html += `<button class="operador-btn" onclick="selecionarOperador('${op.id}', this)">${op.nome.substring(0, 10)}</button>`;
+            });
+            
+            lista.innerHTML = html;
+
+            const listaOps = document.getElementById('listaOperadores');
+            if (ops.length === 0) {
+                listaOps.innerHTML = '<div class="empty-state">Nenhum operador cadastrado</div>';
+            } else {
+                listaOps.innerHTML = ops.map(op => `
+                    <div class="operador-item">
+                        <div class="operador-info">
+                            <div class="operador-nome">${op.nome}</div>
+                            <div class="operador-cargo">${op.cargo}</div>
+                        </div>
+                        <button class="operador-delete" onclick="deletarOperador('${op.id}')">×</button>
+                    </div>
+                `).join('');
             }
+        }
+
+        function selecionarOperador(id, btn) {
+            document.querySelectorAll('.operador-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             
-            atualizarListaOperadores(ops);
+            operadorAtivo = id === 'nenhum' ? null : id;
+            localStorage.setItem(STORAGE_OPERADOR_ATIVO, operadorAtivo || '');
+            carregarOperadorAtivo();
+        }
+
+        function carregarOperadorAtivo() {
+            const ops = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            const ativoId = localStorage.getItem(STORAGE_OPERADOR_ATIVO) || '';
+            
+            if (!ativoId) {
+                document.getElementById('operadorAtual').textContent = 'Operador';
+                document.getElementById('operadorAtivoDisplay').textContent = 'Nenhum';
+                document.getElementById('operadorCaixa').textContent = 'Nenhum';
+                operadorAtivo = null;
+                return;
+            }
+
+            const op = ops.find(o => o.id === ativoId);
+            if (op) {
+                document.getElementById('operadorAtual').textContent = op.nome;
+                document.getElementById('operadorAtivoDisplay').textContent = `${op.nome} (${op.cargo})`;
+                document.getElementById('operadorCaixa').textContent = op.nome;
+                operadorAtivo = ativoId;
+            }
         }
 
         function adicionarOperador() {
-            const nome = document.getElementById('nomeOp').value.trim();
-            const cargo = document.getElementById('cargoOp').value.trim();
+            const nome = document.getElementById('novoOperadorNome').value.trim();
+            const cargo = document.getElementById('novoOperadorCargo').value.trim();
 
-            if (!nome) {
-                alert('Digite o nome');
+            if (!nome || !cargo) {
+                alert('Preencha nome e cargo');
                 return;
             }
 
@@ -899,14 +870,11 @@
             ops.push(op);
             localStorage.setItem(STORAGE_OPERADORES, JSON.stringify(ops));
 
-            document.getElementById('nomeOp').value = '';
-            document.getElementById('cargoOp').value = '';
-
-            if (!usuarioAtual) {
-                usuarioAtual = op.id;
-            }
-
+            document.getElementById('novoOperadorNome').value = '';
+            document.getElementById('novoOperadorCargo').value = '';
+            
             carregarOperadores();
+            alert('✅ Operador cadastrado!');
         }
 
         function deletarOperador(id) {
@@ -915,59 +883,47 @@
                 ops = ops.filter(o => o.id !== id);
                 localStorage.setItem(STORAGE_OPERADORES, JSON.stringify(ops));
                 
-                if (usuarioAtual === id) usuarioAtual = null;
+                if (operadorAtivo === id) {
+                    localStorage.setItem(STORAGE_OPERADOR_ATIVO, '');
+                    carregarOperadorAtivo();
+                }
+                
                 carregarOperadores();
             };
-            abrirModal('🗑️ Remover operador?', 'Esta ação não pode ser desfeita.');
+            abrirModal('🗑️ Remover?', 'Este operador será deletado.');
         }
 
-        function atualizarListaOperadores(ops) {
-            const lista = document.getElementById('listaOperadores');
-            const status = document.getElementById('statusOperador');
-            
-            if (usuarioAtual) {
-                const op = ops.find(o => o.id === usuarioAtual);
-                if (op) {
-                    status.innerHTML = `<div class="alert alert-success">✅ Operador: <strong>${op.nome}</strong></div>`;
-                    document.getElementById('usuarioNome').textContent = op.nome;
-                }
-            }
-
-            if (ops.length === 0) {
-                lista.innerHTML = '<div class="empty-state">Crie um operador para começar</div>';
-                return;
-            }
-
-            lista.innerHTML = ops.map(o => `
-                <div class="user-item">
-                    <div class="user-info">
-                        <div class="user-name">${o.nome}</div>
-                        <div class="user-role">${o.cargo || 'Sem cargo'}</div>
-                    </div>
-                    <button class="user-delete" onclick="deletarOperador('${o.id}')">🗑️</button>
-                </div>
-            `).join('');
+        function selecionarPagamento(tipo, btn) {
+            document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('formaPagamento').value = tipo;
+            formaPagamentoSelecionada = tipo;
         }
 
-        // TRANSAÇÕES
         function adicionarTransacao() {
-            if (!usuarioAtual) {
-                alert('Selecione um operador primeiro');
+            if (!operadorAtivo) {
+                alert('Selecione um operador primeiro!');
                 return;
             }
 
             const tipo = document.getElementById('tipo').value;
             const desc = document.getElementById('descricao').value.trim();
             const valor = parseFloat(document.getElementById('valor').value);
+            const pagamento = document.getElementById('formaPagamento').value;
 
             if (!desc) { alert('Descreva'); return; }
             if (!valor || valor <= 0) { alert('Valor inválido'); return; }
 
+            const ops = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            const opNome = ops.find(o => o.id === operadorAtivo)?.nome || 'Desconhecido';
+
             const trans = {
                 id: Date.now(),
-                tipo, desc, valor,
+                tipo, desc, valor, pagamento,
+                operador: operadorAtivo,
+                operadorNome: opNome,
                 data: new Date().toISOString(),
-                op: usuarioAtual
+                hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
             };
 
             let trans_list = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
@@ -976,6 +932,7 @@
 
             limparFormulario();
             carregarTransacoes();
+            atualizarRelatorio();
         }
 
         function carregarTransacoes() {
@@ -988,22 +945,20 @@
             if (hoje_trans.length === 0) {
                 lista.innerHTML = '<div class="empty-state">Nenhuma transação</div>';
             } else {
-                lista.innerHTML = hoje_trans.reverse().map(t => {
-                    const hora = new Date(t.data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                    return `
-                        <div class="transaction-item">
-                            <div class="transaction-info">
-                                <div class="transaction-time">${hora}</div>
-                                <div class="transaction-desc">${t.desc}</div>
-                                <span class="transaction-tag ${t.tipo}">${t.tipo.toUpperCase()}</span>
-                            </div>
-                            <div class="transaction-value ${t.tipo}">
-                                ${t.tipo === 'saida' ? '-' : '+'}R$ ${t.valor.toFixed(2)}
-                            </div>
-                            <button class="transaction-delete" onclick="deletarTransacao(${t.id})">×</button>
+                lista.innerHTML = hoje_trans.reverse().map(t => `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-time">${t.hora}</div>
+                            <div class="transaction-desc">${t.desc}</div>
+                            <span class="transaction-tag tag-${t.tipo}">${t.tipo.toUpperCase()}</span>
+                            <span class="transaction-tag tag-operador">👤 ${t.operadorNome}</span>
                         </div>
-                    `;
-                }).join('');
+                        <div class="transaction-value ${t.tipo}">
+                            ${t.tipo === 'saida' ? '-' : '+'}R$ ${t.valor.toFixed(2)}
+                        </div>
+                        <button class="transaction-delete" onclick="deletarTransacao(${t.id})">×</button>
+                    </div>
+                `).join('');
             }
 
             atualizarSaldos(hoje_trans);
@@ -1015,6 +970,7 @@
                 trans_list = trans_list.filter(t => t.id !== id);
                 localStorage.setItem(STORAGE_TRANSACOES, JSON.stringify(trans_list));
                 carregarTransacoes();
+                atualizarRelatorio();
             };
             abrirModal('🗑️ Remover?', 'Esta transação será deletada permanentemente.');
         }
@@ -1026,69 +982,168 @@
                 trans_list = todas.filter(t => t.data.split('T')[0] === hoje);
             }
 
-            let entrada = 0, saida = 0, troco = 0;
+            let entrada = 0, saida = 0, dinheiro_entrada = 0, dinheiro_saida = 0;
             trans_list.forEach(t => {
-                if (t.tipo === 'entrada') entrada += t.valor;
-                else if (t.tipo === 'saida') saida += t.valor;
-                else if (t.tipo === 'troco') troco += t.valor;
+                if (t.tipo === 'entrada') {
+                    entrada += t.valor;
+                    if (t.pagamento === 'dinheiro') dinheiro_entrada += t.valor;
+                } else if (t.tipo === 'saida') {
+                    saida += t.valor;
+                    if (t.pagamento === 'dinheiro') dinheiro_saida += t.valor;
+                }
             });
 
             const saldo = entrada - saida;
+            const saldoDinheiro = dinheiro_entrada - dinheiro_saida;
             
-            document.getElementById('saldoTotal').textContent = 'R$ ' + saldo.toFixed(0);
-            document.getElementById('totalEntradas').textContent = 'R$ ' + entrada.toFixed(0);
-            document.getElementById('totalSaidas').textContent = 'R$ ' + saida.toFixed(0);
-            document.getElementById('trocoDisponivel').textContent = 'R$ ' + troco.toFixed(0);
+            document.getElementById('saldoDinheiro').textContent = 'R$ ' + saldoDinheiro.toFixed(2).replace('.', ',');
+            document.getElementById('saldoTotal').textContent = 'R$ ' + saldo.toFixed(2).replace('.', ',');
+            document.getElementById('totalEntradas').textContent = 'R$ ' + entrada.toFixed(2).replace('.', ',');
+            document.getElementById('totalSaidas').textContent = 'R$ ' + saida.toFixed(2).replace('.', ',');
         }
 
-        function limparFormulario() {
-            document.getElementById('descricao').value = '';
-            document.getElementById('valor').value = '';
-            document.getElementById('tipo').value = 'entrada';
-        }
-
-        // RELATÓRIOS
-        function filtrarRelatorio(filtro, btn) {
-            document.querySelectorAll('.filter-btn').forEach(el => el.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            filtroAtual = filtro;
-            atualizarRelatorio();
+        function carregarTrocoAtivo() {
+            const hoje = new Date().toISOString().split('T')[0];
+            const troco = JSON.parse(localStorage.getItem(STORAGE_TROCO) || '{}');
+            const trocoAtivo = troco[hoje] || 0;
+            document.getElementById('trocoAtivoDisplay').textContent = 'R$ ' + trocoAtivo.toFixed(2).replace('.', ',');
         }
 
         function atualizarRelatorio() {
             const trans_list = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
-            let filtradas = [];
-
-            const agora = new Date();
-            
-            if (filtroAtual === 'hoje') {
-                const hoje = agora.toISOString().split('T')[0];
-                filtradas = trans_list.filter(t => t.data.split('T')[0] === hoje);
-            } else if (filtroAtual === '7dias') {
-                const data7 = new Date(agora);
-                data7.setDate(data7.getDate() - 7);
-                filtradas = trans_list.filter(t => new Date(t.data) >= data7);
-            } else if (filtroAtual === '30dias') {
-                const data30 = new Date(agora);
-                data30.setDate(data30.getDate() - 30);
-                filtradas = trans_list.filter(t => new Date(t.data) >= data30);
-            } else if (filtroAtual === 'todos') {
-                filtradas = trans_list;
-            }
+            const hoje = new Date().toISOString().split('T')[0];
+            const filtradas = trans_list.filter(t => t.data.split('T')[0] === hoje);
 
             let entrada = 0, saida = 0;
+            let dinheiro_entrada = 0, debito_entrada = 0, credito_entrada = 0, pix_entrada = 0;
+            let dinheiro_saida = 0;
+
             filtradas.forEach(t => {
-                if (t.tipo === 'entrada') entrada += t.valor;
-                else if (t.tipo === 'saida') saida += t.valor;
+                if (t.tipo === 'entrada') {
+                    entrada += t.valor;
+                    if (t.pagamento === 'dinheiro') dinheiro_entrada += t.valor;
+                    else if (t.pagamento === 'debito') debito_entrada += t.valor;
+                    else if (t.pagamento === 'credito') credito_entrada += t.valor;
+                    else if (t.pagamento === 'pix') pix_entrada += t.valor;
+                } else if (t.tipo === 'saida') {
+                    saida += t.valor;
+                    if (t.pagamento === 'dinheiro') dinheiro_saida += t.valor;
+                }
             });
 
-            const lucro = entrada - saida;
+            document.getElementById('relEntradas').textContent = 'R$ ' + entrada.toFixed(2).replace('.', ',');
+            document.getElementById('relSaidas').textContent = 'R$ ' + saida.toFixed(2).replace('.', ',');
+            document.getElementById('relDinheiro').textContent = 'R$ ' + dinheiro_entrada.toFixed(2).replace('.', ',');
+            document.getElementById('relDebito').textContent = 'R$ ' + debito_entrada.toFixed(2).replace('.', ',');
+            document.getElementById('relCredito').textContent = 'R$ ' + credito_entrada.toFixed(2).replace('.', ',');
+            document.getElementById('relPix').textContent = 'R$ ' + pix_entrada.toFixed(2).replace('.', ',');
 
-            document.getElementById('relEntradas').textContent = 'R$ ' + entrada.toFixed(0);
-            document.getElementById('relSaidas').textContent = 'R$ ' + saida.toFixed(0);
-            document.getElementById('relLucro').textContent = 'R$ ' + lucro.toFixed(0);
-
+            mostrarSugestaoTroco(dinheiro_entrada - dinheiro_saida, dinheiro_entrada, dinheiro_saida);
+            atualizarRelatorioOperadores(filtradas);
             atualizarTabelaRel(filtradas);
+        }
+
+        function mostrarSugestaoTroco(trocoProximo, dinheiroRecebido, dinheiroSaida) {
+            const div = document.getElementById('trocoAutoDiv');
+            
+            if (trocoProximo > 0) {
+                div.innerHTML = `
+                    <div style="background: #eff6ff; border: 2px solid #bfdbfe; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <div style="font-size: 12px; font-weight: 700; color: #1e3a8a; margin-bottom: 10px;">💡 Troco Para Amanhã</div>
+                        <div style="background: rgba(255,255,255,0.7); padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 12px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="color: #1e3a8a;">Dinheiro Recebido:</span>
+                                <span style="font-weight: 700; color: #1e3a8a;">R$ ${dinheiroRecebido.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #1e3a8a;">(-) Saídas:</span>
+                                <span style="font-weight: 700; color: #1e3a8a;">R$ ${dinheiroSaida.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 24px; font-weight: 700; color: #48bb78; text-align: center; margin: 15px 0;">R$ ${trocoProximo.toFixed(2).replace('.', ',')}</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <button class="btn btn-primary" onclick="definirTrocoAutomatico(${trocoProximo})">✅ Usar Isso</button>
+                            <button class="btn btn-secondary" onclick="definirOutroTroco()">✏️ Outro Valor</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function definirTrocoAutomatico(valor) {
+            const amanha = new Date();
+            amanha.setDate(amanha.getDate() + 1);
+            const amanhaStr = amanha.toISOString().split('T')[0];
+
+            let troco = JSON.parse(localStorage.getItem(STORAGE_TROCO) || '{}');
+            troco[amanhaStr] = valor;
+            localStorage.setItem(STORAGE_TROCO, JSON.stringify(troco));
+
+            let historico = JSON.parse(localStorage.getItem(STORAGE_HISTORICO_TROCO) || '[]');
+            historico.push({ data: new Date().toISOString(), valor, dia: amanhaStr });
+            localStorage.setItem(STORAGE_HISTORICO_TROCO, JSON.stringify(historico));
+
+            alert(`✅ Troco definido!`);
+            carregarTrocoAtivo();
+            atualizarHistoricoTrocos();
+        }
+
+        function definirOutroTroco() {
+            const valor = prompt('Digite o valor de troco para amanhã (R$):', '');
+            if (valor === null) return;
+
+            const num = parseFloat(valor);
+            if (isNaN(num) || num < 0) {
+                alert('Valor inválido');
+                return;
+            }
+
+            const amanha = new Date();
+            amanha.setDate(amanha.getDate() + 1);
+            const amanhaStr = amanha.toISOString().split('T')[0];
+
+            let troco = JSON.parse(localStorage.getItem(STORAGE_TROCO) || '{}');
+            troco[amanhaStr] = num;
+            localStorage.setItem(STORAGE_TROCO, JSON.stringify(troco));
+
+            let historico = JSON.parse(localStorage.getItem(STORAGE_HISTORICO_TROCO) || '[]');
+            historico.push({ data: new Date().toISOString(), valor: num, dia: amanhaStr });
+            localStorage.setItem(STORAGE_HISTORICO_TROCO, JSON.stringify(historico));
+
+            carregarTrocoAtivo();
+            atualizarHistoricoTrocos();
+        }
+
+        function atualizarRelatorioOperadores(trans_list) {
+            const ops = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            const div = document.getElementById('relatorioOperadores');
+
+            if (trans_list.length === 0) {
+                div.innerHTML = '<div class="empty-state">Sem transações</div>';
+                return;
+            }
+
+            const porOperador = {};
+            trans_list.forEach(t => {
+                const opId = t.operador || 'nenhum';
+                if (!porOperador[opId]) {
+                    porOperador[opId] = { nome: t.operadorNome || 'Sem Operador', transacoes: 0, valor: 0 };
+                }
+                porOperador[opId].transacoes++;
+                if (t.tipo === 'entrada') porOperador[opId].valor += t.valor;
+            });
+
+            let html = '';
+            Object.values(porOperador).forEach(op => {
+                html += `
+                    <div style="background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #667eea;">
+                        <div style="font-weight: 600; margin-bottom: 5px;">${op.nome}</div>
+                        <div style="font-size: 12px; color: #999;">Transações: ${op.transacoes}</div>
+                        <div style="font-size: 16px; font-weight: 700; color: #48bb78; margin-top: 5px;">R$ ${op.valor.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            div.innerHTML = html;
         }
 
         function atualizarTabelaRel(trans_list) {
@@ -1099,106 +1154,71 @@
                 return;
             }
 
-            lista.innerHTML = trans_list.sort((a, b) => new Date(b.data) - new Date(a.data)).map(t => {
-                const data = new Date(t.data).toLocaleDateString('pt-BR');
-                const hora = new Date(t.data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            lista.innerHTML = trans_list.sort((a, b) => new Date(b.data) - new Date(a.data)).map(t => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-time">${t.hora}</div>
+                        <div class="transaction-desc">${t.desc}</div>
+                        <span class="transaction-tag tag-${t.tipo}">${t.tipo}</span>
+                        <span class="transaction-tag tag-operador">👤 ${t.operadorNome}</span>
+                    </div>
+                    <div class="transaction-value ${t.tipo}">
+                        ${t.tipo === 'saida' ? '-' : '+'}R$ ${t.valor.toFixed(2)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function atualizarHistoricoTrocos() {
+            const historico = JSON.parse(localStorage.getItem(STORAGE_HISTORICO_TROCO) || '[]');
+            const lista = document.getElementById('historicaTrocos');
+
+            if (historico.length === 0) {
+                lista.innerHTML = '<div class="empty-state">Nenhum histórico</div>';
+                return;
+            }
+
+            lista.innerHTML = historico.reverse().slice(0, 10).map(h => {
+                const data = new Date(h.data);
                 return `
                     <div class="transaction-item">
                         <div class="transaction-info">
-                            <div class="transaction-time">${data} ${hora}</div>
-                            <div class="transaction-desc">${t.desc}</div>
-                            <span class="transaction-tag ${t.tipo}">${t.tipo}</span>
+                            <div class="transaction-desc">Troco para ${new Date(h.dia).toLocaleDateString('pt-BR')}</div>
+                            <div class="transaction-time">Definido em ${data.toLocaleDateString('pt-BR')}</div>
                         </div>
-                        <div class="transaction-value ${t.tipo}">
-                            ${t.tipo === 'saida' ? '-' : '+'}R$ ${t.valor.toFixed(2)}
-                        </div>
+                        <div class="transaction-value entrada">R$ ${h.valor.toFixed(2).replace('.', ',')}</div>
                     </div>
                 `;
             }).join('');
         }
 
-        // EXPORTAÇÃO
         function exportarPDF() {
-            const trans_list = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
-            let filtradas = [];
-
-            const agora = new Date();
-            
-            if (filtroAtual === 'hoje') {
-                const hoje = agora.toISOString().split('T')[0];
-                filtradas = trans_list.filter(t => t.data.split('T')[0] === hoje);
-            } else if (filtroAtual === '7dias') {
-                const data7 = new Date(agora);
-                data7.setDate(data7.getDate() - 7);
-                filtradas = trans_list.filter(t => new Date(t.data) >= data7);
-            } else if (filtroAtual === '30dias') {
-                const data30 = new Date(agora);
-                data30.setDate(data30.getDate() - 30);
-                filtradas = trans_list.filter(t => new Date(t.data) >= data30);
-            } else if (filtroAtual === 'todos') {
-                filtradas = trans_list;
-            }
-
-            let entrada = 0, saida = 0;
-            filtradas.forEach(t => {
-                if (t.tipo === 'entrada') entrada += t.valor;
-                else if (t.tipo === 'saida') saida += t.valor;
-            });
-
-            const lucro = entrada - saida;
-
-            document.getElementById('pdfData').textContent = new Date().toLocaleString('pt-BR');
-            document.getElementById('pdfEntr').textContent = 'R$ ' + entrada.toFixed(2);
-            document.getElementById('pdfSaid').textContent = 'R$ ' + saida.toFixed(2);
-            document.getElementById('pdfLucr').textContent = 'R$ ' + lucro.toFixed(2);
-
-            document.getElementById('pdfTransacoes').innerHTML = filtradas
-                .sort((a, b) => new Date(b.data) - new Date(a.data))
-                .map(t => {
-                    const data = new Date(t.data).toLocaleDateString('pt-BR');
-                    return `<tr style="border-bottom: 1px solid #ddd;">
-                        <td>${data}</td>
-                        <td>${t.tipo}</td>
-                        <td>${t.desc}</td>
-                        <td style="text-align: right;">${t.tipo === 'saida' ? '-' : '+'}R$ ${t.valor.toFixed(2)}</td>
-                    </tr>`;
-                }).join('');
-
-            const element = document.getElementById('pdfContent');
-            const opt = {
-                margin: 8,
-                filename: 'caixa_' + new Date().toISOString().split('T')[0] + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-            };
-
-            html2pdf().set(opt).from(element).save();
+            alert('PDF com operadores - Implemente html2pdf conforme necessário');
         }
 
         function exportarCSV() {
             const trans_list = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
             
-            let csv = 'Data,Hora,Tipo,Descrição,Valor\n';
+            let csv = 'Data,Hora,Tipo,Descrição,Operador,Pagamento,Valor\n';
             trans_list.forEach(t => {
                 const data = new Date(t.data).toLocaleDateString('pt-BR');
-                const hora = new Date(t.data).toLocaleTimeString('pt-BR');
-                csv += `"${data}","${hora}","${t.tipo}","${t.desc}","${t.valor}"\n`;
+                csv += `"${data}","${t.hora}","${t.tipo}","${t.desc}","${t.operadorNome}","${t.pagamento}","${t.valor}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'caixa_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.download = 'caixa.csv';
             a.click();
         }
 
-        // BACKUP
         function exportarBackup() {
             const backup = {
-                trans: JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]'),
-                ops: JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]'),
+                transacoes: JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]'),
+                troco: JSON.parse(localStorage.getItem(STORAGE_TROCO) || '{}'),
+                historico: JSON.parse(localStorage.getItem(STORAGE_HISTORICO_TROCO) || '[]'),
+                operadores: JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]'),
                 data: new Date().toISOString()
             };
 
@@ -1206,7 +1226,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'backup_' + new Date().toISOString().split('T')[0] + '.json';
+            a.download = 'backup.json';
             a.click();
         }
 
@@ -1218,39 +1238,54 @@
             reader.onload = (event) => {
                 try {
                     const backup = JSON.parse(event.target.result);
-                    localStorage.setItem(STORAGE_TRANSACOES, JSON.stringify(backup.trans || []));
-                    localStorage.setItem(STORAGE_OPERADORES, JSON.stringify(backup.ops || []));
-                    alert('✅ Restaurado!');
+                    localStorage.setItem(STORAGE_TRANSACOES, JSON.stringify(backup.transacoes || []));
+                    localStorage.setItem(STORAGE_TROCO, JSON.stringify(backup.troco || {}));
+                    localStorage.setItem(STORAGE_HISTORICO_TROCO, JSON.stringify(backup.historico || []));
+                    localStorage.setItem(STORAGE_OPERADORES, JSON.stringify(backup.operadores || []));
                     location.reload();
                 } catch (err) {
-                    alert('❌ Erro: ' + err.message);
+                    alert('Erro: ' + err.message);
                 }
             };
             reader.readAsText(file);
         }
 
+        function limparFormulario() {
+            document.getElementById('descricao').value = '';
+            document.getElementById('valor').value = '';
+            document.getElementById('tipo').value = 'entrada';
+            document.querySelectorAll('.payment-btn').forEach((b, i) => {
+                b.classList.toggle('active', i === 0);
+            });
+            document.getElementById('formaPagamento').value = 'dinheiro';
+        }
+
         function limparHistorico() {
             acaoPendente = () => {
                 localStorage.removeItem(STORAGE_TRANSACOES);
+                localStorage.removeItem(STORAGE_TROCO);
+                localStorage.removeItem(STORAGE_HISTORICO_TROCO);
                 localStorage.removeItem(STORAGE_OPERADORES);
-                usuarioAtual = null;
+                localStorage.removeItem(STORAGE_OPERADOR_ATIVO);
                 location.reload();
             };
             abrirModal('⚠️ Limpar tudo?', 'Todos os dados serão deletados permanentemente!');
         }
 
-        function atualizarStats() {
-            const trans = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
-            const ops = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+        function abrirAba(nome, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + nome).classList.add('active');
             
-            document.getElementById('statsTotal').textContent = trans.length;
-            document.getElementById('statsOp').textContent = ops.length;
-            
-            const size = (JSON.stringify(localStorage).length / 1024).toFixed(1);
-            document.getElementById('statsSize').textContent = size + ' KB';
+            if (nome === 'relatorio') {
+                setTimeout(() => atualizarRelatorio(), 100);
+            }
         }
 
-        // MODAL
+        function atualizarNav(btn) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (btn && btn.classList) btn.classList.add('active');
+        }
+
         function abrirModal(titulo, msg) {
             document.getElementById('modalTitle').textContent = titulo;
             document.getElementById('modalBody').textContent = msg;
@@ -1268,7 +1303,6 @@
             fecharModal();
         }
 
-        // START
         inicializar();
     </script>
 </body>
