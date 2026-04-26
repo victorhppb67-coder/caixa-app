@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Caixa Profissional</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --success: #48bb78;
+            --danger: #f56565;
+            --warning: #ecc94b;
+            --bg: #f5f5f5;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #333;
+            --text-muted: #999;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        header h1 { font-size: 24px; }
+        header small { opacity: 0.9; display: block; margin-top: 5px; }
+
+        .user-select {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            background: var(--surface);
+            padding: 0 20px;
+            border-radius: 8px 8px 0 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 15px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-btn:hover { color: var(--primary); }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .saldo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .saldo-card {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+        }
+
+        .saldo-card.success { border-left-color: var(--success); }
+        .saldo-card.danger { border-left-color: var(--danger); }
+        .saldo-card.warning { border-left-color: var(--warning); }
+
+        .saldo-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+        .saldo-valor { font-size: 28px; font-weight: bold; }
+        .saldo-card.success .saldo-valor { color: var(--success); }
+        .saldo-card.danger .saldo-valor { color: var(--danger); }
+        .saldo-card.warning .saldo-valor { color: #d69e2e; }
+
+        .form-section {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover { background: var(--primary-dark); }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover { background: #cbd5e0; }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover { background: #38a169; }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover { background: #e53e3e; }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .lista-transacoes {
+            background: var(--surface);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .transacao-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .transacao-item:last-child { border-bottom: none; }
+
+        .transacao-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .transacao-data { font-size: 11px; color: var(--text-muted); }
+        .transacao-descricao { font-size: 14px; font-weight: 500; margin: 3px 0; }
+        .transacao-tipo {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .transacao-tipo.entrada { background: #c6f6d5; color: #22543d; }
+        .transacao-tipo.saida { background: #fed7d7; color: #742a2a; }
+        .transacao-tipo.troco { background: #bee3f8; color: #2c5282; }
+
+        .transacao-valor {
+            font-size: 16px;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .transacao-valor.entrada { color: var(--success); }
+        .transacao-valor.saida { color: var(--danger); }
+        .transacao-valor.troco { color: #4299e1; }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin: 20px 0 15px 0;
+            text-transform: uppercase;
+        }
+
+        .tabela {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+        }
+
+        .tabela th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tabela td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .tabela tr:last-child td { border-bottom: none; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .filters {
+            background: var(--surface);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters input, .filters select {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+        .modal-body { margin-bottom: 20px; }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .chart-container {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            height: 300px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border-left-color: var(--success);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .saldo-grid { grid-template-columns: 1fr; }
+            .tabs { padding: 0 10px; overflow-x: auto; }
+            .tab-btn { padding: 12px 15px; font-size: 12px; }
+            header { padding: 15px; }
+            .header-content { flex-direction: column; align-items: flex-start; }
+        }
+
+        .pdf-container {
+            background: white;
+            padding: 40px;
+            margin: 0;
+            display: none;
+        }
+
+        .pdf-container.active { display: block; }
+
+        .pdf-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+
+        .pdf-header h1 { font-size: 24px; margin-bottom: 5px; }
+        .pdf-header p { color: #666; }
+
+        .pdf-section {
+            margin-bottom: 30px;
+        }
+
+        .pdf-section h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .pdf-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pdf-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .pdf-item-label { font-size: 11px; color: #999; }
+        .pdf-item-valor { font-size: 16px; font-weight: bold; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>💰 Gestão de Caixa Profissional</h1>
+                    <small id="dataAtual"></small>
+                </div>
+                <select id="usuarioSelect" class="user-select" onchange="trocarUsuario()">
+                    <option value="">Selecione operador...</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="abrirAba('caixa')">💵 Caixa</button>
+            <button class="tab-btn" onclick="abrirAba('relatorios')">📊 Relatórios</button>
+            <button class="tab-btn" onclick="abrirAba('usuarios')">👥 Operadores</button>
+            <button class="tab-btn" onclick="abrirAba('configuracoes')">⚙️ Configurações</button>
+        </div>
+
+        <!-- ABA CAIXA -->
+        <div id="tab-caixa" class="tab-content active">
+            <div class="saldo-grid">
+                <div class="saldo-card">
+                    <div class="saldo-label">💰 Saldo Total</div>
+                    <div class="saldo-valor" id="saldoTotal">R$ 0,00</div>
+                </div>
+                <div class="saldo-card success">
+                    <div class="saldo-label">📥 Entradas</div>
+                    <div class="saldo-valor" id="totalEntradas">R$ 0,00</div>
+                </div>
+                <div class="saldo-card danger">
+                    <div class="saldo-label">📤 Saídas</div>
+                    <div class="saldo-valor" id="totalSaidas">R$ 0,00</div>
+                </div>
+                <div class="saldo-card warning">
+                    <div class="saldo-label">💵 Troco Disponível</div>
+                    <div class="saldo-valor" id="trocoDisponivel">R$ 0,00</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">Registrar Transação</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tipo de Transação</label>
+                        <select id="tipo">
+                            <option value="entrada">📥 Entrada (Venda/Recebimento)</option>
+                            <option value="saida">📤 Saída (Despesa/Gasto)</option>
+                            <option value="troco">💵 Adicionar Troco</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição</label>
+                        <input type="text" id="descricao" placeholder="Ex: Venda de pão integral">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor (R$)</label>
+                        <input type="number" id="valor" placeholder="0,00" step="0.01" min="0">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="adicionarTransacao()">✅ Registrar</button>
+                    <button class="btn btn-secondary" onclick="limparFormulario()">🔄 Limpar</button>
+                </div>
+            </div>
+
+            <h3 class="section-title">Histórico de Hoje</h3>
+            <div class="lista-transacoes" id="transacoesList">
+                <div class="empty-state">Nenhuma transação registrada</div>
+            </div>
+        </div>
+
+        <!-- ABA RELATÓRIOS -->
+        <div id="tab-relatorios" class="tab-content">
+            <div class="filters">
+                <select id="filtroData" onchange="atualizarRelatorio()">
+                    <option value="hoje">Hoje</option>
+                    <option value="ultimos7">Últimos 7 dias</option>
+                    <option value="ultimos30">Últimos 30 dias</option>
+                    <option value="custom">Período Customizado</option>
+                </select>
+                <input type="date" id="dataInicio" style="display:none;" onchange="atualizarRelatorio()">
+                <input type="date" id="dataFim" style="display:none;" onchange="atualizarRelatorio()">
+                <button class="btn btn-primary" onclick="exportarPDF()">📄 Exportar PDF</button>
+                <button class="btn btn-secondary" onclick="exportarCSV()">📋 Exportar CSV</button>
+            </div>
+
+            <div class="saldo-grid">
+                <div class="saldo-card">
+                    <div class="saldo-label">Entradas</div>
+                    <div class="saldo-valor" id="relEntr" style="color: var(--success);">R$ 0,00</div>
+                </div>
+                <div class="saldo-card">
+                    <div class="saldo-label">Saídas</div>
+                    <div class="saldo-valor" id="relSaid" style="color: var(--danger);">R$ 0,00</div>
+                </div>
+                <div class="saldo-card">
+                    <div class="saldo-label">Lucro Líquido</div>
+                    <div class="saldo-valor" id="relLucr" style="color: var(--primary);">R$ 0,00</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="chartFluxo"></canvas>
+            </div>
+
+            <h3 class="section-title">Transações do Período</h3>
+            <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Hora</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th style="text-align: right;">Valor</th>
+                            <th>Operador</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaTransacoes">
+                        <tr><td colspan="6" class="empty-state">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA OPERADORES -->
+        <div id="tab-usuarios" class="tab-content">
+            <div class="form-section">
+                <h3 class="section-title">Adicionar Novo Operador</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome do Operador</label>
+                        <input type="text" id="nomeOperador" placeholder="Ex: João">
+                    </div>
+                    <div class="form-group">
+                        <label>Cargo/Função</label>
+                        <input type="text" id="cargoOperador" placeholder="Ex: Caixa">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="adicionarOperador()">➕ Adicionar Operador</button>
+            </div>
+
+            <h3 class="section-title">Operadores Cadastrados</h3>
+            <div class="lista-transacoes" id="listaOperadores">
+                <div class="empty-state">Nenhum operador cadastrado</div>
+            </div>
+        </div>
+
+        <!-- ABA CONFIGURAÇÕES -->
+        <div id="tab-configuracoes" class="tab-content">
+            <div class="form-section">
+                <h3 class="section-title">Backup e Recuperação</h3>
+                <div class="btn-group" style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="exportarBackup()">💾 Fazer Backup</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('importBackup').click()">📂 Restaurar Backup</button>
+                    <input type="file" id="importBackup" style="display: none;" accept=".json" onchange="importarBackup()">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">Limpeza de Dados</h3>
+                <button class="btn btn-danger" onclick="limparTodosDados()">🗑️ Limpar Todo Histórico</button>
+                <p style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">⚠️ Esta ação não pode ser desfeita. Faça backup antes!</p>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">Informações do Sistema</h3>
+                <table class="tabela">
+                    <tr>
+                        <td><strong>Total de Transações</strong></td>
+                        <td id="statsTransacoes">0</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Operadores Cadastrados</strong></td>
+                        <td id="statsOperadores">0</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Armazenamento Usado</strong></td>
+                        <td id="statsArmazenamento">0 KB</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAÇÃO -->
+    <div class="modal" id="modalConfirm">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">Confirmar</div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-danger" id="btnConfirmar" onclick="confirmarAcao()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF PARA EXPORTAÇÃO -->
+    <div id="pdfContent" class="pdf-container">
+        <div class="pdf-header">
+            <h1>📊 Relatório de Caixa</h1>
+            <p id="pdfPeriodo"></p>
+        </div>
+        <div class="pdf-section">
+            <h2>Resumo Financeiro</h2>
+            <div class="pdf-grid">
+                <div class="pdf-item">
+                    <div class="pdf-item-label">Entradas</div>
+                    <div class="pdf-item-valor" id="pdfEntradas">R$ 0,00</div>
+                </div>
+                <div class="pdf-item">
+                    <div class="pdf-item-label">Saídas</div>
+                    <div class="pdf-item-valor" id="pdfSaidas">R$ 0,00</div>
+                </div>
+                <div class="pdf-item">
+                    <div class="pdf-item-label">Lucro Líquido</div>
+                    <div class="pdf-item-valor" id="pdfLucro">R$ 0,00</div>
+                </div>
+            </div>
+        </div>
+        <div class="pdf-section">
+            <h2>Detalhamento de Transações</h2>
+            <table class="tabela" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th style="text-align: right;">Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="pdfTransacoes"></tbody>
+            </table>
+        </div>
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
+            <p>Relatório gerado em <span id="pdfData"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_TRANSACOES = 'caixa_transacoes';
+        const STORAGE_OPERADORES = 'caixa_operadores';
+        const STORAGE_CONFIG = 'caixa_config';
+        
+        let usuarioAtual = null;
+        let acaoPendente = null;
+        let chartInstance = null;
+
+        // INICIALIZAÇÃO
+        function inicializar() {
+            atualizarData();
+            carregarOperadores();
+            carregarTransacoes();
+            setInterval(carregarTransacoes, 2000);
+            
+            document.getElementById('filtroData').addEventListener('change', (e) => {
+                const custom = e.target.value === 'custom';
+                document.getElementById('dataInicio').style.display = custom ? 'block' : 'none';
+                document.getElementById('dataFim').style.display = custom ? 'block' : 'none';
+            });
+        }
+
+        function atualizarData() {
+            const agora = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('dataAtual').textContent = agora.toLocaleDateString('pt-BR', options);
+        }
+
+        // NAVEGAÇÃO DE ABAS
+        function abrirAba(aba) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + aba).classList.add('active');
+            event.target.classList.add('active');
+
+            if (aba === 'relatorios') {
+                setTimeout(() => atualizarRelatorio(), 100);
+            } else if (aba === 'configuracoes') {
+                atualizarStats();
+            }
+        }
+
+        // OPERADORES
+        function carregarOperadores() {
+            const operadores = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            const select = document.getElementById('usuarioSelect');
+            
+            select.innerHTML = '<option value="">Selecione operador...</option>';
+            operadores.forEach(op => {
+                const opt = document.createElement('option');
+                opt.value = op.id;
+                opt.textContent = op.nome + (op.cargo ? ' (' + op.cargo + ')' : '');
+                select.appendChild(opt);
+            });
+
+            atualizarListaOperadores();
+        }
+
+        function adicionarOperador() {
+            const nome = document.getElementById('nomeOperador').value.trim();
+            const cargo = document.getElementById('cargoOperador').value.trim();
+
+            if (!nome) {
+                alert('Digite o nome do operador');
+                return;
+            }
+
+            const operador = {
+                id: Date.now().toString(),
+                nome,
+                cargo,
+                dataCriacao: new Date().toISOString()
+            };
+
+            let operadores = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            operadores.push(operador);
+            localStorage.setItem(STORAGE_OPERADORES, JSON.stringify(operadores));
+
+            document.getElementById('nomeOperador').value = '';
+            document.getElementById('cargoOperador').value = '';
+
+            carregarOperadores();
+        }
+
+        function deletarOperador(id) {
+            acaoPendente = () => {
+                let operadores = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+                operadores = operadores.filter(op => op.id !== id);
+                localStorage.setItem(STORAGE_OPERADORES, JSON.stringify(operadores));
+                carregarOperadores();
+            };
+            abrirModal('Remover Operador?', 'Esta ação não pode ser desfeita.');
+        }
+
+        function atualizarListaOperadores() {
+            const operadores = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            const lista = document.getElementById('listaOperadores');
+
+            if (operadores.length === 0) {
+                lista.innerHTML = '<div class="empty-state">Nenhum operador cadastrado</div>';
+                return;
+            }
+
+            lista.innerHTML = operadores.map(op => `
+                <div class="transacao-item">
+                    <div class="transacao-info">
+                        <div class="transacao-descricao">${op.nome}</div>
+                        <div class="transacao-tipo">${op.cargo || 'Sem cargo'}</div>
+                        <div style="font-size: 11px; color: #999; margin-top: 5px;">Desde ${new Date(op.dataCriacao).toLocaleDateString('pt-BR')}</div>
+                    </div>
+                    <button class="btn btn-danger btn-small" onclick="deletarOperador('${op.id}')">🗑️ Remover</button>
+                </div>
+            `).join('');
+        }
+
+        function trocarUsuario() {
+            usuarioAtual = document.getElementById('usuarioSelect').value;
+            if (usuarioAtual) {
+                carregarTransacoes();
+            }
+        }
+
+        // TRANSAÇÕES
+        function adicionarTransacao() {
+            const tipo = document.getElementById('tipo').value;
+            const descricao = document.getElementById('descricao').value.trim();
+            const valor = parseFloat(document.getElementById('valor').value);
+
+            if (!descricao) { alert('Descreva a transação'); return; }
+            if (!valor || valor <= 0) { alert('Digite um valor válido'); return; }
+
+            const transacao = {
+                id: Date.now(),
+                tipo,
+                descricao,
+                valor,
+                data: new Date().toISOString(),
+                operador: usuarioAtual || 'Não identificado',
+                hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            let transacoes = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            transacoes.push(transacao);
+            localStorage.setItem(STORAGE_TRANSACOES, JSON.stringify(transacoes));
+
+            limparFormulario();
+            carregarTransacoes();
+        }
+
+        function carregarTransacoes() {
+            const transacoes = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            const hoje = new Date().toISOString().split('T')[0];
+            const transacoesHoje = transacoes.filter(t => t.data.split('T')[0] === hoje);
+
+            const lista = document.getElementById('transacoesList');
+            if (transacoesHoje.length === 0) {
+                lista.innerHTML = '<div class="empty-state">Nenhuma transação registrada</div>';
+            } else {
+                lista.innerHTML = transacoesHoje.reverse().map(t => `
+                    <div class="transacao-item">
+                        <div class="transacao-info">
+                            <div class="transacao-data">${t.hora}</div>
+                            <div class="transacao-descricao">${t.descricao}</div>
+                            <span class="transacao-tipo ${t.tipo}">${t.tipo.toUpperCase()}</span>
+                        </div>
+                        <div class="transacao-valor ${t.tipo}">
+                            ${t.tipo === 'saida' ? '-' : '+'}R$ ${t.valor.toFixed(2).replace('.', ',')}
+                        </div>
+                        <button class="btn btn-danger btn-small" onclick="deletarTransacao(${t.id})">🗑️</button>
+                    </div>
+                `).join('');
+            }
+
+            atualizarSaldos(transacoesHoje);
+        }
+
+        function deletarTransacao(id) {
+            acaoPendente = () => {
+                let transacoes = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+                transacoes = transacoes.filter(t => t.id !== id);
+                localStorage.setItem(STORAGE_TRANSACOES, JSON.stringify(transacoes));
+                carregarTransacoes();
+            };
+            abrirModal('Remover transação?', 'Esta ação não pode ser desfeita.');
+        }
+
+        function atualizarSaldos(transacoes = null) {
+            if (!transacoes) {
+                const hoje = new Date().toISOString().split('T')[0];
+                const todas = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+                transacoes = todas.filter(t => t.data.split('T')[0] === hoje);
+            }
+
+            let entradas = 0, saidas = 0, troco = 0;
+            transacoes.forEach(t => {
+                if (t.tipo === 'entrada') entradas += t.valor;
+                else if (t.tipo === 'saida') saidas += t.valor;
+                else if (t.tipo === 'troco') troco += t.valor;
+            });
+
+            const saldo = entradas - saidas;
+            document.getElementById('saldoTotal').textContent = 'R$ ' + saldo.toFixed(2).replace('.', ',');
+            document.getElementById('totalEntradas').textContent = 'R$ ' + entradas.toFixed(2).replace('.', ',');
+            document.getElementById('totalSaidas').textContent = 'R$ ' + saidas.toFixed(2).replace('.', ',');
+            document.getElementById('trocoDisponivel').textContent = 'R$ ' + troco.toFixed(2).replace('.', ',');
+        }
+
+        function limparFormulario() {
+            document.getElementById('descricao').value = '';
+            document.getElementById('valor').value = '';
+            document.getElementById('tipo').value = 'entrada';
+        }
+
+        // RELATÓRIOS
+        function atualizarRelatorio() {
+            const filtro = document.getElementById('filtroData').value;
+            const transacoes = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            let filtradas = [];
+
+            const agora = new Date();
+            let dataInicio, dataFim;
+
+            if (filtro === 'hoje') {
+                const hoje = agora.toISOString().split('T')[0];
+                filtradas = transacoes.filter(t => t.data.split('T')[0] === hoje);
+            } else if (filtro === 'ultimos7') {
+                dataInicio = new Date(agora);
+                dataInicio.setDate(dataInicio.getDate() - 7);
+                filtradas = transacoes.filter(t => new Date(t.data) >= dataInicio);
+            } else if (filtro === 'ultimos30') {
+                dataInicio = new Date(agora);
+                dataInicio.setDate(dataInicio.getDate() - 30);
+                filtradas = transacoes.filter(t => new Date(t.data) >= dataInicio);
+            } else if (filtro === 'custom') {
+                const inicio = document.getElementById('dataInicio').value;
+                const fim = document.getElementById('dataFim').value;
+                if (!inicio || !fim) return;
+                filtradas = transacoes.filter(t => {
+                    const data = t.data.split('T')[0];
+                    return data >= inicio && data <= fim;
+                });
+            }
+
+            let entradas = 0, saidas = 0;
+            filtradas.forEach(t => {
+                if (t.tipo === 'entrada') entradas += t.valor;
+                else if (t.tipo === 'saida') saidas += t.valor;
+            });
+
+            const lucro = entradas - saidas;
+
+            document.getElementById('relEntr').textContent = 'R$ ' + entradas.toFixed(2).replace('.', ',');
+            document.getElementById('relSaid').textContent = 'R$ ' + saidas.toFixed(2).replace('.', ',');
+            document.getElementById('relLucr').textContent = 'R$ ' + lucro.toFixed(2).replace('.', ',');
+
+            atualizarTabelaRelatorio(filtradas);
+            desenharGrafico(filtradas);
+        }
+
+        function atualizarTabelaRelatorio(transacoes) {
+            const tbody = document.getElementById('tabelaTransacoes');
+            
+            if (transacoes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhuma transação neste período</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = transacoes.sort((a, b) => new Date(b.data) - new Date(a.data)).map(t => {
+                const data = new Date(t.data);
+                const dataStr = data.toLocaleDateString('pt-BR');
+                const horaStr = data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                const sinal = t.tipo === 'saida' ? '-' : '+';
+                
+                return `
+                    <tr>
+                        <td>${dataStr}</td>
+                        <td>${horaStr}</td>
+                        <td><span class="transacao-tipo ${t.tipo}">${t.tipo.toUpperCase()}</span></td>
+                        <td>${t.descricao}</td>
+                        <td style="text-align: right; font-weight: bold;">${sinal}R$ ${t.valor.toFixed(2).replace('.', ',')}</td>
+                        <td>${t.operador === 'Não identificado' ? '-' : t.operador}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function desenharGrafico(transacoes) {
+            const ctx = document.getElementById('chartFluxo');
+            if (!ctx) return;
+
+            const dados = {};
+            const datas = new Set();
+
+            transacoes.forEach(t => {
+                const data = new Date(t.data).toLocaleDateString('pt-BR');
+                datas.add(data);
+                
+                if (!dados[data]) dados[data] = { entrada: 0, saida: 0 };
+                if (t.tipo === 'entrada') dados[data].entrada += t.valor;
+                else if (t.tipo === 'saida') dados[data].saida += t.valor;
+            });
+
+            const labels = Array.from(datas).sort();
+            const entradas = labels.map(d => dados[d].entrada);
+            const saidas = labels.map(d => dados[d].saida);
+
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Entradas',
+                            data: entradas,
+                            backgroundColor: '#48bb78',
+                            borderColor: '#38a169',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Saídas',
+                            data: saidas,
+                            backgroundColor: '#f56565',
+                            borderColor: '#e53e3e',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // EXPORTAÇÃO
+        function exportarPDF() {
+            const filtro = document.getElementById('filtroData').value;
+            const transacoes = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            let filtradas = [];
+
+            const agora = new Date();
+
+            if (filtro === 'hoje') {
+                const hoje = agora.toISOString().split('T')[0];
+                filtradas = transacoes.filter(t => t.data.split('T')[0] === hoje);
+            } else if (filtro === 'ultimos7') {
+                const dataInicio = new Date(agora);
+                dataInicio.setDate(dataInicio.getDate() - 7);
+                filtradas = transacoes.filter(t => new Date(t.data) >= dataInicio);
+            } else if (filtro === 'ultimos30') {
+                const dataInicio = new Date(agora);
+                dataInicio.setDate(dataInicio.getDate() - 30);
+                filtradas = transacoes.filter(t => new Date(t.data) >= dataInicio);
+            } else {
+                const inicio = document.getElementById('dataInicio').value;
+                const fim = document.getElementById('dataFim').value;
+                if (!inicio || !fim) {
+                    alert('Selecione o período');
+                    return;
+                }
+                filtradas = transacoes.filter(t => {
+                    const data = t.data.split('T')[0];
+                    return data >= inicio && data <= fim;
+                });
+            }
+
+            let entradas = 0, saidas = 0;
+            filtradas.forEach(t => {
+                if (t.tipo === 'entrada') entradas += t.valor;
+                else if (t.tipo === 'saida') saidas += t.valor;
+            });
+
+            const lucro = entradas - saidas;
+
+            document.getElementById('pdfPeriodo').textContent = 'Período: ' + 
+                (filtro === 'hoje' ? 'Hoje' : 
+                 filtro === 'ultimos7' ? 'Últimos 7 dias' :
+                 filtro === 'ultimos30' ? 'Últimos 30 dias' :
+                 document.getElementById('dataInicio').value + ' a ' + document.getElementById('dataFim').value);
+
+            document.getElementById('pdfEntradas').textContent = 'R$ ' + entradas.toFixed(2).replace('.', ',');
+            document.getElementById('pdfSaidas').textContent = 'R$ ' + saidas.toFixed(2).replace('.', ',');
+            document.getElementById('pdfLucro').textContent = 'R$ ' + lucro.toFixed(2).replace('.', ',');
+
+            document.getElementById('pdfTransacoes').innerHTML = filtradas
+                .sort((a, b) => new Date(b.data) - new Date(a.data))
+                .map(t => {
+                    const data = new Date(t.data).toLocaleDateString('pt-BR');
+                    const sinal = t.tipo === 'saida' ? '-' : '+';
+                    return `
+                        <tr>
+                            <td>${data}</td>
+                            <td>${t.tipo.toUpperCase()}</td>
+                            <td>${t.descricao}</td>
+                            <td style="text-align: right;">${sinal}R$ ${t.valor.toFixed(2).replace('.', ',')}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            document.getElementById('pdfData').textContent = new Date().toLocaleString('pt-BR');
+
+            const element = document.getElementById('pdfContent');
+            const opt = {
+                margin: 10,
+                filename: 'relatorio_caixa_' + new Date().toISOString().split('T')[0] + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function exportarCSV() {
+            const transacoes = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            
+            let csv = 'Data,Hora,Tipo,Descrição,Valor,Operador\n';
+            transacoes.forEach(t => {
+                const data = new Date(t.data);
+                const dataStr = data.toLocaleDateString('pt-BR');
+                const horaStr = data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                csv += `"${dataStr}","${horaStr}","${t.tipo}","${t.descricao}","${t.valor}","${t.operador}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'caixa_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+        }
+
+        // BACKUP
+        function exportarBackup() {
+            const backup = {
+                transacoes: JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]'),
+                operadores: JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]'),
+                data: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'backup_caixa_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+        }
+
+        function importarBackup(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const backup = JSON.parse(event.target.result);
+                    localStorage.setItem(STORAGE_TRANSACOES, JSON.stringify(backup.transacoes || []));
+                    localStorage.setItem(STORAGE_OPERADORES, JSON.stringify(backup.operadores || []));
+                    alert('Backup restaurado com sucesso!');
+                    location.reload();
+                } catch (err) {
+                    alert('Erro ao restaurar backup: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function limparTodosDados() {
+            acaoPendente = () => {
+                localStorage.removeItem(STORAGE_TRANSACOES);
+                localStorage.removeItem(STORAGE_OPERADORES);
+                localStorage.removeItem(STORAGE_CONFIG);
+                location.reload();
+            };
+            abrirModal('⚠️ Limpar todo histórico?', 'ATENÇÃO: Esta ação não pode ser desfeita. Todos os dados serão permanentemente deletados. Faça backup antes de continuar!');
+            document.getElementById('btnConfirmar').textContent = 'Confirmar e Deletar';
+        }
+
+        function atualizarStats() {
+            const transacoes = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            const operadores = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            
+            document.getElementById('statsTransacoes').textContent = transacoes.length;
+            document.getElementById('statsOperadores').textContent = operadores.length;
+
+            const storage = JSON.stringify(localStorage).length;
+            const kb = (storage / 1024).toFixed(2);
+            document.getElementById('statsArmazenamento').textContent = kb + ' KB';
+        }
+
+        // MODAL
+        function abrirModal(titulo, mensagem) {
+            document.getElementById('modalTitle').textContent = titulo;
+            document.getElementById('modalBody').textContent = mensagem;
+            document.getElementById('btnConfirmar').textContent = 'Confirmar';
+            document.getElementById('modalConfirm').classList.add('active');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalConfirm').classList.remove('active');
+            acaoPendente = null;
+        }
+
+        function confirmarAcao() {
+            if (acaoPendente) acaoPendente();
+            fecharModal();
+        }
+
+        // INICIALIZAÇÃO
+        inicializar();
+    </script>
+</body>
+</html>

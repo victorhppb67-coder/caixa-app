@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Caixa Mobile</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --success: #48bb78;
+            --danger: #f56565;
+            --warning: #ecc94b;
+            --bg: #f5f5f5;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #333;
+            --text-muted: #999;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 15px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+
+        .header-user {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .main-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .container {
+            padding: 15px;
+            padding-bottom: 100px;
+        }
+
+        .saldo-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .saldo-card {
+            background: var(--surface);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .saldo-card.success { border-left-color: var(--success); }
+        .saldo-card.danger { border-left-color: var(--danger); }
+        .saldo-card.warning { border-left-color: var(--warning); }
+
+        .saldo-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .saldo-valor {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .saldo-card.success .saldo-valor { color: var(--success); }
+        .saldo-card.danger .saldo-valor { color: var(--danger); }
+        .saldo-card.warning .saldo-valor { color: #d69e2e; }
+
+        .tabs-nav {
+            display: flex;
+            gap: 0;
+            background: var(--surface);
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 10px;
+            background: none;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: 0.2s;
+            white-space: nowrap;
+            min-width: 60px;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.2s;
+        }
+
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            touch-action: manipulation;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:active { background: var(--primary-dark); }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text);
+        }
+
+        .btn-secondary:active { background: #cbd5e0; }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:active { background: #e53e3e; }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:active { background: #38a169; }
+
+        .btn-block {
+            width: 100%;
+            grid-column: 1 / -1;
+        }
+
+        .transaction-list {
+            background: var(--surface);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            gap: 10px;
+        }
+
+        .transaction-item:last-child { border-bottom: none; }
+
+        .transaction-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .transaction-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .transaction-desc {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .transaction-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 6px;
+            border-radius: 3px;
+            margin-top: 4px;
+        }
+
+        .transaction-tag.entrada { background: #c6f6d5; color: #22543d; }
+        .transaction-tag.saida { background: #fed7d7; color: #742a2a; }
+        .transaction-tag.troco { background: #bee3f8; color: #2c5282; }
+
+        .transaction-value {
+            font-size: 15px;
+            font-weight: 700;
+            text-align: right;
+            min-width: 70px;
+        }
+
+        .transaction-value.entrada { color: var(--success); }
+        .transaction-value.saida { color: var(--danger); }
+        .transaction-value.troco { color: #4299e1; }
+
+        .transaction-delete {
+            padding: 6px;
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin: 20px 0 12px 0;
+            text-transform: uppercase;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--surface);
+            width: 100%;
+            padding: 20px;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .modal-body {
+            margin-bottom: 15px;
+        }
+
+        .modal-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .user-section {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-item:last-child { border-bottom: none; }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .user-delete {
+            padding: 6px;
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .report-card {
+            background: var(--surface);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .report-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .report-value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .filter-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .filter-btn {
+            padding: 10px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+            z-index: 500;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item {
+            padding: 10px 5px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            touch-action: manipulation;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #c6f6d5;
+        }
+
+        .setup-section {
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .setup-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .setup-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .setup-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quick-btn {
+            padding: 14px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .quick-btn:active {
+            background: var(--bg);
+            border-color: var(--primary);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1a1a1a;
+                --surface: #2d2d2d;
+                --border: #444;
+                --text: #f0f0f0;
+                --text-muted: #999;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">💰 Caixa Mobile</div>
+        <div class="header-info">
+            <span id="dataHora"></span>
+            <div class="header-user" id="usuarioNome">Selecione operador</div>
+        </div>
+    </div>
+
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="abrirAba('caixa', this)">💵 Caixa</button>
+        <button class="tab-btn" onclick="abrirAba('relatorio', this)">📊 Relatório</button>
+        <button class="tab-btn" onclick="abrirAba('operadores', this)">👥 Operadores</button>
+        <button class="tab-btn" onclick="abrirAba('config', this)">⚙️ Config</button>
+    </div>
+
+    <div class="main-container">
+        <div class="container">
+            <!-- ABA CAIXA -->
+            <div id="tab-caixa" class="tab-content active">
+                <div class="saldo-cards">
+                    <div class="saldo-card">
+                        <div class="saldo-label">Saldo</div>
+                        <div class="saldo-valor" id="saldoTotal">R$ 0</div>
+                    </div>
+                    <div class="saldo-card success">
+                        <div class="saldo-label">Entradas</div>
+                        <div class="saldo-valor" id="totalEntradas">R$ 0</div>
+                    </div>
+                    <div class="saldo-card danger">
+                        <div class="saldo-label">Saídas</div>
+                        <div class="saldo-valor" id="totalSaidas">R$ 0</div>
+                    </div>
+                    <div class="saldo-card warning">
+                        <div class="saldo-label">Troco</div>
+                        <div class="saldo-valor" id="trocoDisponivel">R$ 0</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Tipo</label>
+                    <select id="tipo">
+                        <option value="entrada">📥 Entrada</option>
+                        <option value="saida">📤 Saída</option>
+                        <option value="troco">💵 Troco</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Descrição</label>
+                    <input type="text" id="descricao" placeholder="Ex: Venda de pão" autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <label>Valor (R$)</label>
+                    <input type="number" id="valor" placeholder="0,00" step="0.01" min="0" inputmode="decimal">
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="adicionarTransacao()">✅ Registrar</button>
+                    <button class="btn btn-secondary" onclick="limparFormulario()">🔄 Limpar</button>
+                </div>
+
+                <div class="section-title">Histórico de Hoje</div>
+                <div class="transaction-list" id="transacoesList">
+                    <div class="empty-state">Nenhuma transação</div>
+                </div>
+            </div>
+
+            <!-- ABA RELATÓRIO -->
+            <div id="tab-relatorio" class="tab-content">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filtrarRelatorio('hoje', this)">Hoje</button>
+                    <button class="filter-btn" onclick="filtrarRelatorio('7dias', this)">7 dias</button>
+                    <button class="filter-btn" onclick="filtrarRelatorio('30dias', this)">30 dias</button>
+                    <button class="filter-btn" onclick="abrirCustomDate()">📅 Custom</button>
+                </div>
+
+                <div class="report-grid">
+                    <div class="report-card">
+                        <div class="report-label">Entradas</div>
+                        <div class="report-value" style="color: var(--success);" id="relEntradas">R$ 0</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="report-label">Saídas</div>
+                        <div class="report-value" style="color: var(--danger);" id="relSaidas">R$ 0</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="report-label">Lucro</div>
+                        <div class="report-value" style="color: var(--primary);" id="relLucro">R$ 0</div>
+                    </div>
+                </div>
+
+                <div class="btn-row" style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="exportarPDF()">📄 PDF</button>
+                    <button class="btn btn-success" onclick="exportarCSV()">📋 CSV</button>
+                </div>
+
+                <div class="section-title">Transações</div>
+                <div class="transaction-list" id="transacoesRelatorio">
+                    <div class="empty-state">Carregando...</div>
+                </div>
+            </div>
+
+            <!-- ABA OPERADORES -->
+            <div id="tab-operadores" class="tab-content">
+                <div id="statusOperador"></div>
+
+                <div class="input-group">
+                    <label>Nome do Operador</label>
+                    <input type="text" id="nomeOp" placeholder="Ex: João" autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <label>Cargo</label>
+                    <input type="text" id="cargoOp" placeholder="Ex: Caixa" autocomplete="off">
+                </div>
+
+                <button class="btn btn-primary btn-block" onclick="adicionarOperador()">➕ Adicionar</button>
+
+                <div class="section-title">Operadores</div>
+                <div class="user-section" id="listaOperadores">
+                    <div class="empty-state">Nenhum operador</div>
+                </div>
+            </div>
+
+            <!-- ABA CONFIGURAÇÕES -->
+            <div id="tab-config" class="tab-content">
+                <div class="section-title">Backup</div>
+                <div class="btn-row" style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="exportarBackup()">💾 Backup</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restaurar</button>
+                    <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importarBackup()">
+                </div>
+
+                <div class="section-title">Dados</div>
+                <div class="btn-row">
+                    <button class="btn btn-danger" onclick="limparHistorico()">🗑️ Limpar Tudo</button>
+                </div>
+
+                <div class="section-title" style="margin-top: 30px;">Info</div>
+                <div class="user-section">
+                    <div class="user-item">
+                        <span>Transações</span>
+                        <strong id="statsTotal">0</strong>
+                    </div>
+                    <div class="user-item">
+                        <span>Operadores</span>
+                        <strong id="statsOp">0</strong>
+                    </div>
+                    <div class="user-item">
+                        <span>Armazenamento</span>
+                        <strong id="statsSize">0 KB</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="abrirAba('caixa'); atualizarNav(this)">
+            <span class="nav-icon">💵</span>
+            <span>Caixa</span>
+        </button>
+        <button class="nav-item" onclick="abrirAba('relatorio'); atualizarNav(this)">
+            <span class="nav-icon">📊</span>
+            <span>Relatório</span>
+        </button>
+        <button class="nav-item" onclick="abrirAba('operadores'); atualizarNav(this)">
+            <span class="nav-icon">👥</span>
+            <span>Operadores</span>
+        </button>
+        <button class="nav-item" onclick="abrirAba('config'); atualizarNav(this)">
+            <span class="nav-icon">⚙️</span>
+            <span>Config</span>
+        </button>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="modalConfirm">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">Confirmar</div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-danger" id="btnConfirmar" onclick="confirmarAcao()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF -->
+    <div id="pdfContent" style="display: none;">
+        <h1>📊 Relatório de Caixa</h1>
+        <p id="pdfData"></p>
+        <hr>
+        <h2>Resumo</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr><td>Entradas:</td><td style="text-align: right;"><strong id="pdfEntr">R$ 0</strong></td></tr>
+            <tr><td>Saídas:</td><td style="text-align: right;"><strong id="pdfSaid">R$ 0</strong></td></tr>
+            <tr style="font-weight: bold; border-top: 2px solid #000;">
+                <td>Lucro Líquido:</td>
+                <td style="text-align: right;"><strong id="pdfLucr">R$ 0</strong></td>
+            </tr>
+        </table>
+        <hr>
+        <h2>Detalhes</h2>
+        <table id="pdfTransacoes" style="width: 100%; border-collapse: collapse; font-size: 12px;"></table>
+    </div>
+
+    <script>
+        const STORAGE_TRANSACOES = 'caixa_transacoes_mob';
+        const STORAGE_OPERADORES = 'caixa_operadores_mob';
+        
+        let usuarioAtual = null;
+        let acaoPendente = null;
+        let filtroAtual = 'hoje';
+
+        // INICIALIZAÇÃO
+        function inicializar() {
+            atualizarHora();
+            carregarOperadores();
+            carregarTransacoes();
+            
+            setInterval(atualizarHora, 60000);
+            setInterval(carregarTransacoes, 3000);
+            
+            // Focar em descricao ao abrir caixa
+            document.getElementById('descricao').addEventListener('focus', function() {
+                setTimeout(() => window.scrollTo(0, 0), 300);
+            });
+        }
+
+        function atualizarHora() {
+            const agora = new Date();
+            const hora = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const data = agora.toLocaleDateString('pt-BR', { weekday: 'short', month: 'short', day: 'numeric' });
+            document.getElementById('dataHora').textContent = `${hora} • ${data}`;
+        }
+
+        // NAVEGAÇÃO
+        function abrirAba(aba, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + aba).classList.add('active');
+            
+            if (btn) btn.classList.add('active');
+
+            if (aba === 'relatorio') {
+                setTimeout(() => atualizarRelatorio(), 100);
+            } else if (aba === 'config') {
+                atualizarStats();
+            }
+        }
+
+        function atualizarNav(btn) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // OPERADORES
+        function carregarOperadores() {
+            const ops = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            const select = document.getElementById('usuarioNome');
+            
+            if (!usuarioAtual && ops.length > 0) {
+                usuarioAtual = ops[0].id;
+            }
+            
+            atualizarListaOperadores(ops);
+        }
+
+        function adicionarOperador() {
+            const nome = document.getElementById('nomeOp').value.trim();
+            const cargo = document.getElementById('cargoOp').value.trim();
+
+            if (!nome) {
+                alert('Digite o nome');
+                return;
+            }
+
+            const op = {
+                id: Date.now().toString(),
+                nome,
+                cargo,
+                data: new Date().toISOString()
+            };
+
+            let ops = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            ops.push(op);
+            localStorage.setItem(STORAGE_OPERADORES, JSON.stringify(ops));
+
+            document.getElementById('nomeOp').value = '';
+            document.getElementById('cargoOp').value = '';
+
+            if (!usuarioAtual) {
+                usuarioAtual = op.id;
+            }
+
+            carregarOperadores();
+        }
+
+        function deletarOperador(id) {
+            acaoPendente = () => {
+                let ops = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+                ops = ops.filter(o => o.id !== id);
+                localStorage.setItem(STORAGE_OPERADORES, JSON.stringify(ops));
+                
+                if (usuarioAtual === id) usuarioAtual = null;
+                carregarOperadores();
+            };
+            abrirModal('🗑️ Remover operador?', 'Esta ação não pode ser desfeita.');
+        }
+
+        function atualizarListaOperadores(ops) {
+            const lista = document.getElementById('listaOperadores');
+            const status = document.getElementById('statusOperador');
+            
+            if (usuarioAtual) {
+                const op = ops.find(o => o.id === usuarioAtual);
+                if (op) {
+                    status.innerHTML = `<div class="alert alert-success">✅ Operador: <strong>${op.nome}</strong></div>`;
+                }
+            }
+
+            if (ops.length === 0) {
+                lista.innerHTML = '<div class="empty-state">Crie um operador para começar</div>';
+                return;
+            }
+
+            lista.innerHTML = ops.map(o => `
+                <div class="user-item">
+                    <div class="user-info">
+                        <div class="user-name">${o.nome}</div>
+                        <div class="user-role">${o.cargo || 'Sem cargo'}</div>
+                    </div>
+                    <button class="user-delete" onclick="deletarOperador('${o.id}')">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        // TRANSAÇÕES
+        function adicionarTransacao() {
+            if (!usuarioAtual) {
+                alert('Selecione um operador primeiro');
+                return;
+            }
+
+            const tipo = document.getElementById('tipo').value;
+            const desc = document.getElementById('descricao').value.trim();
+            const valor = parseFloat(document.getElementById('valor').value);
+
+            if (!desc) { alert('Descreva'); return; }
+            if (!valor || valor <= 0) { alert('Valor inválido'); return; }
+
+            const trans = {
+                id: Date.now(),
+                tipo, desc, valor,
+                data: new Date().toISOString(),
+                op: usuarioAtual
+            };
+
+            let trans_list = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            trans_list.push(trans);
+            localStorage.setItem(STORAGE_TRANSACOES, JSON.stringify(trans_list));
+
+            limparFormulario();
+            carregarTransacoes();
+        }
+
+        function carregarTransacoes() {
+            const trans_list = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            const hoje = new Date().toISOString().split('T')[0];
+            const hoje_trans = trans_list.filter(t => t.data.split('T')[0] === hoje);
+
+            const lista = document.getElementById('transacoesList');
+            
+            if (hoje_trans.length === 0) {
+                lista.innerHTML = '<div class="empty-state">Nenhuma transação</div>';
+            } else {
+                lista.innerHTML = hoje_trans.reverse().map(t => {
+                    const hora = new Date(t.data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    return `
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-time">${hora}</div>
+                                <div class="transaction-desc">${t.desc}</div>
+                                <span class="transaction-tag ${t.tipo}">${t.tipo.toUpperCase()}</span>
+                            </div>
+                            <div class="transaction-value ${t.tipo}">
+                                ${t.tipo === 'saida' ? '-' : '+'}R$ ${t.valor.toFixed(2)}
+                            </div>
+                            <button class="transaction-delete" onclick="deletarTransacao(${t.id})">×</button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            atualizarSaldos(hoje_trans);
+        }
+
+        function deletarTransacao(id) {
+            acaoPendente = () => {
+                let trans_list = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+                trans_list = trans_list.filter(t => t.id !== id);
+                localStorage.setItem(STORAGE_TRANSACOES, JSON.stringify(trans_list));
+                carregarTransacoes();
+            };
+            abrirModal('🗑️ Remover?', 'Esta transação será deletada permanentemente.');
+        }
+
+        function atualizarSaldos(trans_list = null) {
+            if (!trans_list) {
+                const hoje = new Date().toISOString().split('T')[0];
+                const todas = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+                trans_list = todas.filter(t => t.data.split('T')[0] === hoje);
+            }
+
+            let entrada = 0, saida = 0, troco = 0;
+            trans_list.forEach(t => {
+                if (t.tipo === 'entrada') entrada += t.valor;
+                else if (t.tipo === 'saida') saida += t.valor;
+                else if (t.tipo === 'troco') troco += t.valor;
+            });
+
+            const saldo = entrada - saida;
+            
+            document.getElementById('saldoTotal').textContent = 'R$ ' + saldo.toFixed(0);
+            document.getElementById('totalEntradas').textContent = 'R$ ' + entrada.toFixed(0);
+            document.getElementById('totalSaidas').textContent = 'R$ ' + saida.toFixed(0);
+            document.getElementById('trocoDisponivel').textContent = 'R$ ' + troco.toFixed(0);
+        }
+
+        function limparFormulario() {
+            document.getElementById('descricao').value = '';
+            document.getElementById('valor').value = '';
+            document.getElementById('tipo').value = 'entrada';
+        }
+
+        // RELATÓRIOS
+        function filtrarRelatorio(filtro, btn) {
+            document.querySelectorAll('.filter-btn').forEach(el => el.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            filtroAtual = filtro;
+            atualizarRelatorio();
+        }
+
+        function abrirCustomDate() {
+            alert('Use os filtros rápidos para mobile');
+        }
+
+        function atualizarRelatorio() {
+            const trans_list = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            let filtradas = [];
+
+            const agora = new Date();
+            
+            if (filtroAtual === 'hoje') {
+                const hoje = agora.toISOString().split('T')[0];
+                filtradas = trans_list.filter(t => t.data.split('T')[0] === hoje);
+            } else if (filtroAtual === '7dias') {
+                const data7 = new Date(agora);
+                data7.setDate(data7.getDate() - 7);
+                filtradas = trans_list.filter(t => new Date(t.data) >= data7);
+            } else if (filtroAtual === '30dias') {
+                const data30 = new Date(agora);
+                data30.setDate(data30.getDate() - 30);
+                filtradas = trans_list.filter(t => new Date(t.data) >= data30);
+            }
+
+            let entrada = 0, saida = 0;
+            filtradas.forEach(t => {
+                if (t.tipo === 'entrada') entrada += t.valor;
+                else if (t.tipo === 'saida') saida += t.valor;
+            });
+
+            const lucro = entrada - saida;
+
+            document.getElementById('relEntradas').textContent = 'R$ ' + entrada.toFixed(0);
+            document.getElementById('relSaidas').textContent = 'R$ ' + saida.toFixed(0);
+            document.getElementById('relLucro').textContent = 'R$ ' + lucro.toFixed(0);
+
+            atualizarTabelaRel(filtradas);
+        }
+
+        function atualizarTabelaRel(trans_list) {
+            const lista = document.getElementById('transacoesRelatorio');
+            
+            if (trans_list.length === 0) {
+                lista.innerHTML = '<div class="empty-state">Sem transações</div>';
+                return;
+            }
+
+            lista.innerHTML = trans_list.sort((a, b) => new Date(b.data) - new Date(a.data)).map(t => {
+                const data = new Date(t.data).toLocaleDateString('pt-BR');
+                const hora = new Date(t.data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                return `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-time">${data} ${hora}</div>
+                            <div class="transaction-desc">${t.desc}</div>
+                            <span class="transaction-tag ${t.tipo}">${t.tipo}</span>
+                        </div>
+                        <div class="transaction-value ${t.tipo}">
+                            ${t.tipo === 'saida' ? '-' : '+'}R$ ${t.valor.toFixed(2)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // EXPORTAÇÃO
+        function exportarPDF() {
+            const trans_list = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            let filtradas = [];
+
+            const agora = new Date();
+            
+            if (filtroAtual === 'hoje') {
+                const hoje = agora.toISOString().split('T')[0];
+                filtradas = trans_list.filter(t => t.data.split('T')[0] === hoje);
+            } else if (filtroAtual === '7dias') {
+                const data7 = new Date(agora);
+                data7.setDate(data7.getDate() - 7);
+                filtradas = trans_list.filter(t => new Date(t.data) >= data7);
+            } else if (filtroAtual === '30dias') {
+                const data30 = new Date(agora);
+                data30.setDate(data30.getDate() - 30);
+                filtradas = trans_list.filter(t => new Date(t.data) >= data30);
+            }
+
+            let entrada = 0, saida = 0;
+            filtradas.forEach(t => {
+                if (t.tipo === 'entrada') entrada += t.valor;
+                else if (t.tipo === 'saida') saida += t.valor;
+            });
+
+            const lucro = entrada - saida;
+
+            document.getElementById('pdfData').textContent = new Date().toLocaleString('pt-BR');
+            document.getElementById('pdfEntr').textContent = 'R$ ' + entrada.toFixed(2);
+            document.getElementById('pdfSaid').textContent = 'R$ ' + saida.toFixed(2);
+            document.getElementById('pdfLucr').textContent = 'R$ ' + lucro.toFixed(2);
+
+            document.getElementById('pdfTransacoes').innerHTML = filtradas
+                .sort((a, b) => new Date(b.data) - new Date(a.data))
+                .map(t => {
+                    const data = new Date(t.data).toLocaleDateString('pt-BR');
+                    return `<tr style="border-bottom: 1px solid #ddd;">
+                        <td>${data}</td>
+                        <td>${t.tipo}</td>
+                        <td>${t.desc}</td>
+                        <td style="text-align: right;">${t.tipo === 'saida' ? '-' : '+'}R$ ${t.valor.toFixed(2)}</td>
+                    </tr>`;
+                }).join('');
+
+            const element = document.getElementById('pdfContent');
+            const opt = {
+                margin: 8,
+                filename: 'caixa_' + new Date().toISOString().split('T')[0] + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function exportarCSV() {
+            const trans_list = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            
+            let csv = 'Data,Hora,Tipo,Descrição,Valor\n';
+            trans_list.forEach(t => {
+                const data = new Date(t.data).toLocaleDateString('pt-BR');
+                const hora = new Date(t.data).toLocaleTimeString('pt-BR');
+                csv += `"${data}","${hora}","${t.tipo}","${t.desc}","${t.valor}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'caixa_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+        }
+
+        // BACKUP
+        function exportarBackup() {
+            const backup = {
+                trans: JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]'),
+                ops: JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]'),
+                data: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'backup_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+        }
+
+        function importarBackup(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const backup = JSON.parse(event.target.result);
+                    localStorage.setItem(STORAGE_TRANSACOES, JSON.stringify(backup.trans || []));
+                    localStorage.setItem(STORAGE_OPERADORES, JSON.stringify(backup.ops || []));
+                    alert('✅ Restaurado!');
+                    location.reload();
+                } catch (err) {
+                    alert('❌ Erro: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function limparHistorico() {
+            acaoPendente = () => {
+                localStorage.removeItem(STORAGE_TRANSACOES);
+                localStorage.removeItem(STORAGE_OPERADORES);
+                usuarioAtual = null;
+                location.reload();
+            };
+            abrirModal('⚠️ Limpar tudo?', 'Todos os dados serão deletados permanentemente!');
+        }
+
+        function atualizarStats() {
+            const trans = JSON.parse(localStorage.getItem(STORAGE_TRANSACOES) || '[]');
+            const ops = JSON.parse(localStorage.getItem(STORAGE_OPERADORES) || '[]');
+            
+            document.getElementById('statsTotal').textContent = trans.length;
+            document.getElementById('statsOp').textContent = ops.length;
+            
+            const size = (JSON.stringify(localStorage).length / 1024).toFixed(1);
+            document.getElementById('statsSize').textContent = size + ' KB';
+        }
+
+        // MODAL
+        function abrirModal(titulo, msg) {
+            document.getElementById('modalTitle').textContent = titulo;
+            document.getElementById('modalBody').textContent = msg;
+            document.getElementById('btnConfirmar').textContent = 'Confirmar';
+            document.getElementById('modalConfirm').classList.add('active');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalConfirm').classList.remove('active');
+            acaoPendente = null;
+        }
+
+        function confirmarAcao() {
+            if (acaoPendente) acaoPendente();
+            fecharModal();
+        }
+
+        // START
+        inicializar();
+    </script>
+</body>
+</html>
